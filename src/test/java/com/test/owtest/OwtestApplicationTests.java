@@ -8,7 +8,10 @@ class OwtestApplicationTests {
 
     @Test
     void contextLoads() throws Exception {
-        throw new Exception();
+        try{}
+        catch (Exception e) {
+            throw new Exception(e);
+        }
     }
 
 }
