@@ -3,7 +3,7 @@ package com.test.owtest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class DefaultController {
         this.productService = productService;
     }
 
-    @PostMapping(value = "/product")
+    @GetMapping(value = "/product")
     public String findProducts(Model model) {
         List<Product> products = productService.findAll();
         model.addAttribute("products", products);
