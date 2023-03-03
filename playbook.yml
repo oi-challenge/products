@@ -1,0 +1,49 @@
+---
+- name: Deploy java application to remote VM
+  hosts: host1
+  become: yes
+  tasks:
+    - name: install docker
+      package:
+        name:
+        - docker
+        - python3
+        state: present
+    - name: install a pip modules
+      pip:
+        name:
+        - docker
+        state: present
+    - name: copy db to remote host
+      copy:
+        src: ./products/sample.ddl
+        dest: ~/db/
+    - name: run docker with db
+      docker_container:
+        name: db
+        image: mysql
+        volumes:
+          - "~/db/sample.ddl:/docker-entrypoint-initdb.d/owtest.sql"
+        ports:
+          - "3306:3306"
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD=1
+          LANG=C.UTF-8
+        command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+        state: started
+    - name: waiting for mysql running
+      pause:
+        minutes: 2
+    - name: copy war to remote host
+      copy:
+        src: ./products/target/owtest-0.0.1-SNAPSHOT.war
+        dest: ~/app/
+    - name: run an application
+      docker_container:
+        name: app
+        image: tomcat:9
+        volumes:
+          - "~/app/owtest-0.0.1-SNAPSHOT.war:/usr/local/tomcat/webapps/ROOT.war"
+        ports:
+          - "8080:8080"
+        state: started
